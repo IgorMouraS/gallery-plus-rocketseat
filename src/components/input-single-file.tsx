@@ -3,7 +3,7 @@ import Icon from './icon';
 import Text, { textVariants } from './text';
 import UploadIcon from '../assets/icons/upload-file.svg?react';
 import FileIcon from '../assets/icons/image.svg?react';
-import { useWatch, type FieldValues, type UseFormReturn } from 'react-hook-form';
+import { useWatch, type FieldValues, type UseFormReturn, type Path } from 'react-hook-form';
 import { useMemo } from 'react';
 
 export const inputSingleFileVariants = tv({
@@ -37,29 +37,29 @@ export const inputSingleFileIconVariants = tv({
   },
 });
 
-interface InputSingleFileProps
+interface InputSingleFileProps<T extends FieldValues = FieldValues>
   extends
     Omit<React.ComponentProps<'input'>, 'size' | 'form'>,
     VariantProps<typeof inputSingleFileIconVariants> {
-  form: UseFormReturn<FieldValues>;
+  form: UseFormReturn<T>;
   allowedExtensions: string[];
-  maxSize: number;
+  maxFileSize: number;
   error?: React.ReactNode;
   replaceBy?: React.ReactNode;
 }
 
-export default function InputSingleFile({
+export default function InputSingleFile<T extends FieldValues = FieldValues>({
   size,
   error,
   form,
   allowedExtensions,
-  maxSize,
+  maxFileSize,
   replaceBy,
   ...props
-}: InputSingleFileProps) {
+}: InputSingleFileProps<T>) {
   const formValues = useWatch({ control: form.control });
   const name = props.name;
-  const formFile = useMemo(() => formValues[name as keyof FieldValues]?.[0], [formValues, name]);
+  const formFile = useMemo(() => formValues[name as Path<T>]?.[0], [formValues, name]);
   const { extensionFile, sizeFile } = useMemo(() => {
     return {
       extensionFile: formFile?.name.split('.').pop() || '',
@@ -72,7 +72,7 @@ export default function InputSingleFile({
   }
 
   function isAllowedSize(): boolean {
-    return sizeFile <= maxSize * 1024 * 1024;
+    return sizeFile <= maxFileSize * 1024 * 1024;
   }
 
   function isAllowedFile(): boolean {
@@ -113,7 +113,7 @@ export default function InputSingleFile({
                 Arquivo inválido
               </Text>
             )}
-            {formFile && error && (
+            {error && (
               <Text variant="label-small" className="text-accent-red">
                 {error}
               </Text>
@@ -140,7 +140,7 @@ export default function InputSingleFile({
                     variant: 'label-small',
                     className: 'text-accent-red cursor-pointer hover-underline',
                   })}
-                  onClick={() => form.setValue(name as keyof FieldValues, undefined)}
+                  onClick={() => form.setValue(name as Path<T>, undefined as any)}
                 >
                   Remover
                 </button>

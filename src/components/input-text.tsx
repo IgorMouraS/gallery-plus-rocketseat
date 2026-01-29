@@ -1,5 +1,4 @@
 import Icon from './icon';
-import SearchIcon from '../assets/icons/search.svg?react';
 import Text from './text';
 import { tv, type VariantProps } from 'tailwind-variants';
 
@@ -50,7 +49,7 @@ interface InputTextProps
   extends
     Omit<React.ComponentProps<'input'>, 'size'>,
     VariantProps<typeof inputTextWrapperVariants> {
-  icon: React.ComponentProps<typeof Icon>['svg'];
+  icon?: React.ComponentProps<typeof Icon>['svg'];
   error?: React.ReactNode;
 }
 
